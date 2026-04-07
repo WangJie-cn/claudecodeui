@@ -326,7 +326,7 @@ export default function Shell({
         />
       </div>
 
-      <div className="relative flex-1 overflow-hidden p-2" onClick={handleTerminalTap}>
+      <div className="relative flex-1 overflow-hidden p-2" onDoubleClick={handleTerminalTap}>
         <div
           ref={terminalContainerRef}
           className="h-full w-full focus:outline-none"
