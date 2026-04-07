@@ -48,6 +48,8 @@ function MainContent({
   onNavigateToSession,
   onShowSettings,
   externalMessageUpdate,
+  pendingTmuxSession,
+  onTmuxSessionConsumed,
 }: MainContentProps) {
   const { preferences } = useUiPreferences();
   const { autoExpandTools, showRawParameters, showThinking, autoScrollToBottom, sendByCtrlEnter } = preferences;
@@ -83,6 +85,16 @@ function MainContent({
 
   // Track whether Shell tab was opened via Terminal button (plain tmux mode)
   const [shellPlainMode, setShellPlainMode] = useState(false);
+  const [tmuxSessionOverride, setTmuxSessionOverride] = useState<string | null>(null);
+
+  // Handle tmux session selected from sidebar
+  useEffect(() => {
+    if (pendingTmuxSession && activeTab === 'shell') {
+      setShellPlainMode(true);
+      setTmuxSessionOverride(pendingTmuxSession);
+      onTmuxSessionConsumed?.();
+    }
+  }, [pendingTmuxSession, activeTab, onTmuxSessionConsumed]);
 
   const handleOpenTerminal = useCallback(() => {
     setShellPlainMode(true);
@@ -165,9 +177,11 @@ function MainContent({
               <StandaloneShell
                 project={selectedProject}
                 session={shellPlainMode ? null : selectedSession}
+                command={tmuxSessionOverride ? `tmux new -A -s ${tmuxSessionOverride}` : undefined}
+                isPlainShell={shellPlainMode || !!tmuxSessionOverride}
                 showHeader={false}
                 isActive={activeTab === 'shell'}
-                autoConnect={!shellPlainMode}
+                autoConnect={!!tmuxSessionOverride || !shellPlainMode}
               />
             </div>
           )}

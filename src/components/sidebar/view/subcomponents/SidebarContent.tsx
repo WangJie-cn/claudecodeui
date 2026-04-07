@@ -8,6 +8,7 @@ import type { ConversationSearchResults, SearchProgress } from '../../hooks/useS
 import SidebarFooter from './SidebarFooter';
 import SidebarHeader from './SidebarHeader';
 import SidebarProjectList, { type SidebarProjectListProps } from './SidebarProjectList';
+import TmuxSidebarSection from './TmuxSidebarSection';
 
 type SearchMode = 'projects' | 'conversations';
 
@@ -58,6 +59,7 @@ type SidebarContentProps = {
   latestVersion: string | null;
   onShowVersionModal: () => void;
   onShowSettings: () => void;
+  onTmuxSelect?: (sessionName: string) => void;
   projectListProps: SidebarProjectListProps;
   t: TFunction;
 };
@@ -85,6 +87,7 @@ export default function SidebarContent({
   latestVersion,
   onShowVersionModal,
   onShowSettings,
+  onTmuxSelect,
   projectListProps,
   t,
 }: SidebarContentProps) {
@@ -212,6 +215,8 @@ export default function SidebarContent({
           <SidebarProjectList {...projectListProps} />
         )}
       </ScrollArea>
+
+      {onTmuxSelect && <TmuxSidebarSection onSelect={onTmuxSelect} />}
 
       <SidebarFooter
         updateAvailable={updateAvailable}

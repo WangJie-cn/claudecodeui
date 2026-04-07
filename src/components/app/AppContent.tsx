@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Sidebar from '../sidebar/view/Sidebar';
@@ -124,11 +124,24 @@ export default function AppContent() {
     }
   }, [isConnected, selectedSession?.id, sendMessage]);
 
+  // Tmux session selected from sidebar
+  const [pendingTmuxSession, setPendingTmuxSession] = useState<string | null>(null);
+
+  const handleTmuxSelect = useCallback((sessionName: string) => {
+    // If no project selected, select first one
+    if (!selectedProject && sidebarSharedProps.projects.length > 0) {
+      sidebarSharedProps.onProjectSelect(sidebarSharedProps.projects[0]);
+    }
+    setPendingTmuxSession(sessionName);
+    setActiveTab('shell');
+    setSidebarOpen(false);
+  }, [selectedProject, sidebarSharedProps, setActiveTab, setSidebarOpen]);
+
   return (
     <div className="fixed inset-0 flex bg-background">
       {!isMobile ? (
         <div className="h-full flex-shrink-0 border-r border-border/50">
-          <Sidebar {...sidebarSharedProps} />
+          <Sidebar {...sidebarSharedProps} onTmuxSelect={handleTmuxSelect} />
         </div>
       ) : (
         <div
@@ -154,7 +167,7 @@ export default function AppContent() {
             onClick={(event) => event.stopPropagation()}
             onTouchStart={(event) => event.stopPropagation()}
           >
-            <Sidebar {...sidebarSharedProps} />
+            <Sidebar {...sidebarSharedProps} onTmuxSelect={handleTmuxSelect} />
           </div>
         </div>
       )}
@@ -181,6 +194,8 @@ export default function AppContent() {
           onNavigateToSession={(targetSessionId: string) => navigate(`/session/${targetSessionId}`)}
           onShowSettings={() => setShowSettings(true)}
           externalMessageUpdate={externalMessageUpdate}
+          pendingTmuxSession={pendingTmuxSession}
+          onTmuxSessionConsumed={() => setPendingTmuxSession(null)}
         />
       </div>
 

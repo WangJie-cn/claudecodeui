@@ -38,6 +38,7 @@ export type SidebarProps = {
   settingsInitialTab: string;
   onCloseSettings: () => void;
   isMobile: boolean;
+  onTmuxSelect?: (sessionName: string) => void;
 };
 
 export type SessionViewModel = {
