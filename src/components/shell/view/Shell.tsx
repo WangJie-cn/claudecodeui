@@ -236,6 +236,16 @@ export default function Shell({
     }
   }, [isConnected]);
 
+  // Toggle body class for CSS to hide parent header + FAB
+  useEffect(() => {
+    if (chromeHidden) {
+      document.body.classList.add('shell-fullscreen');
+    } else {
+      document.body.classList.remove('shell-fullscreen');
+    }
+    return () => document.body.classList.remove('shell-fullscreen');
+  }, [chromeHidden]);
+
   if (!selectedProject) {
     return (
       <ShellEmptyState
