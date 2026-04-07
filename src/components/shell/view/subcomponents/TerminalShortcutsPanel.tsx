@@ -42,6 +42,8 @@ type TerminalShortcutsPanelProps = {
   terminalRef: MutableRefObject<Terminal | null>;
   isConnected: boolean;
   bottomOffset?: string;
+  onToggleChrome?: () => void;
+  chromeHidden?: boolean;
 };
 
 const preventFocusSteal = (e: React.PointerEvent) => e.preventDefault();
@@ -58,6 +60,8 @@ export default function TerminalShortcutsPanel({
   terminalRef,
   isConnected,
   bottomOffset = 'bottom-14',
+  onToggleChrome,
+  chromeHidden,
 }: TerminalShortcutsPanelProps) {
   const { t } = useTranslation('settings');
   const [ctrlActive, setCtrlActive] = useState(false);
@@ -111,6 +115,18 @@ export default function TerminalShortcutsPanel({
   return (
     <div className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-1 pb-[max(4px,env(safe-area-inset-bottom))] md:hidden`}>
       <div className="pointer-events-auto flex items-center gap-0.5 overflow-x-auto rounded-lg border border-gray-700/80 bg-gray-900/95 px-1 py-1 shadow-lg backdrop-blur-sm [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {onToggleChrome && (
+          <button
+            type="button"
+            onPointerDown={preventFocusSteal}
+            onClick={onToggleChrome}
+            className={chromeHidden ? ICON_BTN : KEY_BTN_ACTIVE}
+            title="Toggle toolbar"
+          >
+            {chromeHidden ? '▲' : '▼'}
+          </button>
+        )}
+
         <button
           type="button"
           onPointerDown={preventFocusSteal}
