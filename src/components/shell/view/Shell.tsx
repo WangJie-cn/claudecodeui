@@ -326,7 +326,7 @@ export default function Shell({
         />
       </div>
 
-      <div className="relative flex-1 overflow-hidden p-2" onDoubleClick={handleTerminalTap}>
+      <div className="relative flex-1 overflow-hidden" onDoubleClick={handleTerminalTap}>
         <div
           ref={terminalContainerRef}
           className="h-full w-full focus:outline-none"
@@ -409,11 +409,13 @@ export default function Shell({
         </div>
       )}
 
-      {!chromeHidden && (
+      {/* Shortcuts always visible on mobile when connected */}
+      {isConnected && (
         <TerminalShortcutsPanel
           wsRef={wsRef}
           terminalRef={terminalRef}
           isConnected={isConnected}
+          bottomOffset="bottom-0"
         />
       )}
 

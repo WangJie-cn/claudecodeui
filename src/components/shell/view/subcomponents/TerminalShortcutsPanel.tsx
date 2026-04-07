@@ -17,9 +17,11 @@ type Shortcut =
   | { type: 'arrow'; id: string; sequence: string; icon: 'up' | 'down' | 'left' | 'right' };
 
 const MOBILE_KEYS: Shortcut[] = [
+  { type: 'key', id: 'ctrl-c', label: '^C', sequence: '\x03' },
+  { type: 'key', id: 'ctrl-d', label: '^D', sequence: '\x04' },
+  { type: 'key', id: 'ctrl-z', label: '^Z', sequence: '\x1a' },
   { type: 'key', id: 'esc', label: 'Esc', sequence: '\x1b' },
   { type: 'key', id: 'tab', label: 'Tab', sequence: '\t' },
-  { type: 'key', id: 'shift-tab', label: '\u21e7Tab', sequence: '\x1b[Z' },
   { type: 'modifier', id: 'ctrl', label: 'CTRL', modifier: 'ctrl' },
   { type: 'modifier', id: 'alt', label: 'ALT', modifier: 'alt' },
   { type: 'arrow', id: 'arrow-up', sequence: '\x1b[A', icon: 'up' },
@@ -107,8 +109,8 @@ export default function TerminalShortcutsPanel({
   );
 
   return (
-    <div className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-2 md:hidden`}>
-      <div className="pointer-events-auto flex items-center gap-1 overflow-x-auto rounded-lg border border-gray-700/80 bg-gray-900/95 px-1.5 py-1.5 shadow-lg backdrop-blur-sm [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className={`pointer-events-none fixed inset-x-0 ${bottomOffset} z-20 px-1 pb-[max(4px,env(safe-area-inset-bottom))] md:hidden`}>
+      <div className="pointer-events-auto flex items-center gap-0.5 overflow-x-auto rounded-lg border border-gray-700/80 bg-gray-900/95 px-1 py-1 shadow-lg backdrop-blur-sm [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
           onPointerDown={preventFocusSteal}

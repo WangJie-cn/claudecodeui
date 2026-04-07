@@ -12,9 +12,12 @@ export const PROMPT_OPTION_SCAN_LINES = 15;
 export const PROMPT_MAX_OPTIONS = 5;
 export const PROMPT_MIN_OPTIONS = 2;
 
+// Detect mobile for larger font
+const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
 export const TERMINAL_OPTIONS: ITerminalOptions = {
   cursorBlink: true,
-  fontSize: 14,
+  fontSize: isMobile ? 16 : 14,
   fontFamily: 'Menlo, Monaco, "Courier New", monospace',
   allowProposedApi: true,
   allowTransparency: false,
