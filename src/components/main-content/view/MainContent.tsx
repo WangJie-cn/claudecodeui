@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ChatInterface from '../../chat/view/ChatInterface';
 import FileTree from '../../file-tree/view/FileTree';
 import StandaloneShell from '../../standalone-shell/view/StandaloneShell';
@@ -81,6 +81,21 @@ function MainContent({
     }
   }, [selectedProject, currentProject?.name, setCurrentProject]);
 
+  // Track whether Shell tab was opened via Terminal button (plain tmux mode)
+  const [shellPlainMode, setShellPlainMode] = useState(false);
+
+  const handleOpenTerminal = useCallback(() => {
+    setShellPlainMode(true);
+    setActiveTab('shell');
+  }, [setActiveTab]);
+
+  // Reset plain mode when leaving Shell tab
+  useEffect(() => {
+    if (activeTab !== 'shell' && shellPlainMode) {
+      setShellPlainMode(false);
+    }
+  }, [activeTab, shellPlainMode]);
+
   useEffect(() => {
     if (!shouldShowTasksTab && activeTab === 'tasks') {
       setActiveTab('chat');
@@ -134,7 +149,7 @@ function MainContent({
                 sendByCtrlEnter={sendByCtrlEnter}
                 externalMessageUpdate={externalMessageUpdate}
                 onShowAllTasks={tasksEnabled ? () => setActiveTab('tasks') : null}
-                onOpenTerminal={() => setActiveTab('shell')}
+                onOpenTerminal={handleOpenTerminal}
               />
             </ErrorBoundary>
           </div>
@@ -149,9 +164,10 @@ function MainContent({
             <div className="h-full w-full overflow-hidden">
               <StandaloneShell
                 project={selectedProject}
-                session={selectedSession}
+                session={shellPlainMode ? null : selectedSession}
                 showHeader={false}
                 isActive={activeTab === 'shell'}
+                autoConnect={!shellPlainMode}
               />
             </div>
           )}
