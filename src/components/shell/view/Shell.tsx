@@ -226,6 +226,14 @@ export default function Shell({
     }
   }, [isConnected]);
 
+  const scrollToTop = useCallback(() => {
+    terminalRef.current?.scrollToTop();
+  }, [terminalRef]);
+
+  const scrollToBottom = useCallback(() => {
+    terminalRef.current?.scrollToBottom();
+  }, [terminalRef]);
+
   // Auto-hide chrome 1.5s after connecting
   useEffect(() => {
     if (isConnected) {
@@ -378,6 +386,28 @@ export default function Shell({
           </div>
         )}
       </div>
+
+      {/* Scroll navigation buttons - visible when chrome is shown */}
+      {!chromeHidden && isConnected && (
+        <div className="absolute right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col gap-2">
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); scrollToTop(); }}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800/90 text-gray-300 shadow-lg backdrop-blur-sm transition-colors hover:bg-gray-700 hover:text-white active:scale-95"
+            title="Scroll to top"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" /></svg>
+          </button>
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); scrollToBottom(); }}
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-800/90 text-gray-300 shadow-lg backdrop-blur-sm transition-colors hover:bg-gray-700 hover:text-white active:scale-95"
+            title="Scroll to bottom"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
+        </div>
+      )}
 
       {!chromeHidden && (
         <TerminalShortcutsPanel
