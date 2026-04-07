@@ -1679,7 +1679,7 @@ function handleShellConnection(ws) {
 
                 // Include command hash in session key so different commands get separate sessions
                 const commandSuffix = isPlainShell && initialCommand
-                    ? `_cmd_${Buffer.from(initialCommand).toString('base64').slice(0, 16)}`
+                    ? `_cmd_${Buffer.from(initialCommand).toString('base64').slice(0, 48)}`
                     : '';
                 ptySessionKey = `${projectPath}_${sessionId || 'default'}${commandSuffix}`;
 
