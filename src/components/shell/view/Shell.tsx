@@ -51,6 +51,7 @@ export default function Shell({
   const initialCommand = tmuxSessionName ? `tmux new -A -s ${tmuxSessionName}` : initialCommandProp;
   const isPlainShell = tmuxSessionName ? true : isPlainShellProp;
   const [tmuxAutoConnect, setTmuxAutoConnect] = useState(false);
+  const [chromeHidden, setChromeHidden] = useState(false);
   const [cliPromptOptions, setCliPromptOptions] = useState<CliPromptOption[] | null>(null);
   const promptCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onOutputRef = useRef<(() => void) | null>(null);
@@ -218,6 +219,23 @@ export default function Shell({
     }
   }, [tmuxAutoConnect, tmuxSessionName, isInitialized, isConnected, isConnecting, connectToShell]);
 
+  // Toggle chrome visibility on terminal tap (mobile)
+  const handleTerminalTap = useCallback(() => {
+    if (isConnected) {
+      setChromeHidden((prev) => !prev);
+    }
+  }, [isConnected]);
+
+  // Auto-hide chrome 1.5s after connecting
+  useEffect(() => {
+    if (isConnected) {
+      const timer = setTimeout(() => setChromeHidden(true), 1500);
+      return () => clearTimeout(timer);
+    } else {
+      setChromeHidden(false);
+    }
+  }, [isConnected]);
+
   if (!selectedProject) {
     return (
       <ShellEmptyState
@@ -270,25 +288,27 @@ export default function Shell({
 
   return (
     <div className="flex h-full w-full flex-col bg-gray-900">
-      <ShellHeader
-        isConnected={isConnected}
-        isInitialized={isInitialized}
-        isRestarting={isRestarting}
-        hasSession={Boolean(selectedSession)}
-        sessionDisplayNameShort={sessionDisplayNameShort}
-        onDisconnect={disconnectFromShell}
-        onRestart={handleRestartShell}
-        statusNewSessionText={t('shell.status.newSession')}
-        statusInitializingText={t('shell.status.initializing')}
-        statusRestartingText={t('shell.status.restarting')}
-        disconnectLabel={t('shell.actions.disconnect')}
-        disconnectTitle={t('shell.actions.disconnectTitle')}
-        restartLabel={t('shell.actions.restart')}
-        restartTitle={t('shell.actions.restartTitle')}
-        disableRestart={isRestarting || isConnected}
-      />
+      <div className={`flex-shrink-0 transition-all duration-200 ${chromeHidden ? 'h-0 overflow-hidden opacity-0' : ''}`}>
+        <ShellHeader
+          isConnected={isConnected}
+          isInitialized={isInitialized}
+          isRestarting={isRestarting}
+          hasSession={Boolean(selectedSession)}
+          sessionDisplayNameShort={sessionDisplayNameShort}
+          onDisconnect={disconnectFromShell}
+          onRestart={handleRestartShell}
+          statusNewSessionText={t('shell.status.newSession')}
+          statusInitializingText={t('shell.status.initializing')}
+          statusRestartingText={t('shell.status.restarting')}
+          disconnectLabel={t('shell.actions.disconnect')}
+          disconnectTitle={t('shell.actions.disconnectTitle')}
+          restartLabel={t('shell.actions.restart')}
+          restartTitle={t('shell.actions.restartTitle')}
+          disableRestart={isRestarting || isConnected}
+        />
+      </div>
 
-      <div className="relative flex-1 overflow-hidden p-2">
+      <div className="relative flex-1 overflow-hidden p-2" onClick={handleTerminalTap}>
         <div
           ref={terminalContainerRef}
           className="h-full w-full focus:outline-none"
@@ -349,11 +369,13 @@ export default function Shell({
         )}
       </div>
 
-      <TerminalShortcutsPanel
-        wsRef={wsRef}
-        terminalRef={terminalRef}
-        isConnected={isConnected}
-      />
+      {!chromeHidden && (
+        <TerminalShortcutsPanel
+          wsRef={wsRef}
+          terminalRef={terminalRef}
+          isConnected={isConnected}
+        />
+      )}
 
     </div>
   );
