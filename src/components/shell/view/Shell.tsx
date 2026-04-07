@@ -326,7 +326,7 @@ export default function Shell({
         />
       </div>
 
-      <div className="relative flex-1 overflow-hidden" onDoubleClick={handleTerminalTap}>
+      <div className="relative flex-1 overflow-hidden">
         <div
           ref={terminalContainerRef}
           className="h-full w-full focus:outline-none"
@@ -386,6 +386,21 @@ export default function Shell({
           </div>
         )}
       </div>
+
+      {/* Toggle bar - always visible thin strip at top of terminal */}
+      {isConnected && (
+        <button
+          type="button"
+          onClick={handleTerminalTap}
+          className={`flex w-full items-center justify-center py-1 transition-colors ${
+            chromeHidden
+              ? 'bg-gray-800 hover:bg-gray-700'
+              : 'bg-indigo-600 hover:bg-indigo-500'
+          }`}
+        >
+          <div className="h-1 w-10 rounded-full bg-gray-400/50" />
+        </button>
+      )}
 
       {/* Scroll navigation buttons - visible when chrome is shown */}
       {!chromeHidden && isConnected && (
