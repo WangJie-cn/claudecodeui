@@ -18,6 +18,7 @@ import ShellEmptyState from './subcomponents/ShellEmptyState';
 import ShellHeader from './subcomponents/ShellHeader';
 import ShellMinimalView from './subcomponents/ShellMinimalView';
 import TerminalShortcutsPanel from './subcomponents/TerminalShortcutsPanel';
+import TmuxSessionSelector from './subcomponents/TmuxSessionSelector';
 
 type CliPromptOption = { number: string; label: string };
 
@@ -35,8 +36,8 @@ type ShellProps = {
 export default function Shell({
   selectedProject = null,
   selectedSession = null,
-  initialCommand = null,
-  isPlainShell = false,
+  initialCommand: initialCommandProp = null,
+  isPlainShell: isPlainShellProp = false,
   onProcessComplete = null,
   minimal = false,
   autoConnect = false,
@@ -44,6 +45,12 @@ export default function Shell({
 }: ShellProps) {
   const { t } = useTranslation('chat');
   const [isRestarting, setIsRestarting] = useState(false);
+
+  // Tmux session override: when user picks a tmux session, override command
+  const [tmuxSessionName, setTmuxSessionName] = useState<string | null>(null);
+  const initialCommand = tmuxSessionName ? `tmux new -A -s ${tmuxSessionName}` : initialCommandProp;
+  const isPlainShell = tmuxSessionName ? true : isPlainShellProp;
+  const [tmuxAutoConnect, setTmuxAutoConnect] = useState(false);
   const [cliPromptOptions, setCliPromptOptions] = useState<CliPromptOption[] | null>(null);
   const promptCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onOutputRef = useRef<(() => void) | null>(null);
@@ -196,6 +203,21 @@ export default function Shell({
     }, SHELL_RESTART_DELAY_MS);
   }, []);
 
+  // When tmux session is selected and shell connects, auto-connect
+  const handleTmuxSelect = useCallback((name: string) => {
+    setTmuxSessionName(name);
+    setTmuxAutoConnect(true);
+  }, []);
+
+  // Auto-connect when tmux session changes
+  useEffect(() => {
+    if (tmuxAutoConnect && tmuxSessionName && isInitialized && !isConnected && !isConnecting) {
+      setTmuxAutoConnect(false);
+      // Small delay to let refs update
+      window.setTimeout(() => connectToShell(), 100);
+    }
+  }, [tmuxAutoConnect, tmuxSessionName, isInitialized, isConnected, isConnecting, connectToShell]);
+
   if (!selectedProject) {
     return (
       <ShellEmptyState
@@ -274,15 +296,22 @@ export default function Shell({
         />
 
         {overlayMode && (
-          <ShellConnectionOverlay
-            mode={overlayMode}
-            description={overlayDescription}
-            loadingLabel={t('shell.loading')}
-            connectLabel={t('shell.actions.connect')}
-            connectTitle={t('shell.actions.connectTitle')}
-            connectingLabel={t('shell.connecting')}
-            onConnect={connectToShell}
-          />
+          <>
+            <ShellConnectionOverlay
+              mode={overlayMode}
+              description={overlayDescription}
+              loadingLabel={t('shell.loading')}
+              connectLabel={t('shell.actions.connect')}
+              connectTitle={t('shell.actions.connectTitle')}
+              connectingLabel={t('shell.connecting')}
+              onConnect={connectToShell}
+            />
+            {overlayMode === 'connect' && !tmuxSessionName && (
+              <div className="absolute inset-x-0 bottom-0 z-20 max-h-[60%] overflow-y-auto border-t border-gray-700/60 bg-gray-900/95 px-4 py-3 backdrop-blur-sm">
+                <TmuxSessionSelector onSelect={handleTmuxSelect} />
+              </div>
+            )}
+          </>
         )}
 
         {cliPromptOptions && isConnected && (

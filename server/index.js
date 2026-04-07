@@ -39,7 +39,7 @@ import os from 'os';
 import http from 'http';
 import cors from 'cors';
 import { promises as fsPromises } from 'fs';
-import { spawn } from 'child_process';
+import { spawn, execFileSync } from 'child_process';
 import pty from 'node-pty';
 import fetch from 'node-fetch';
 import mime from 'mime-types';
@@ -351,6 +351,31 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         installMode
     });
+});
+
+// Tmux sessions API (public, no auth needed for local use)
+app.get('/api/tmux-sessions', async (req, res) => {
+    try {
+        const uid = process.getuid ? process.getuid() : 1000;
+        const socketPath = `/tmp/tmux-${uid}/default`;
+        const output = execFileSync('/usr/bin/tmux', [
+            '-S', socketPath,
+            'list-sessions', '-F',
+            '#{session_name}|#{session_windows}|#{session_attached}|#{session_created}'
+        ], { encoding: 'utf-8', timeout: 5000 });
+        const sessions = output.trim().split('\n').filter(Boolean).map(line => {
+            const [name, windows, attached, created] = line.split('|');
+            return {
+                name,
+                windows: parseInt(windows) || 0,
+                attached: parseInt(attached) > 0,
+                created: new Date(parseInt(created) * 1000).toISOString()
+            };
+        });
+        res.json({ sessions });
+    } catch (e) {
+        res.json({ sessions: [] });
+    }
 });
 
 // Optional API key validation (if configured)
