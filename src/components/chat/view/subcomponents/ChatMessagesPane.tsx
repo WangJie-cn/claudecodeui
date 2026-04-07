@@ -30,6 +30,7 @@ interface ChatMessagesPaneProps {
   tasksEnabled: boolean;
   isTaskMasterInstalled: boolean | null;
   onShowAllTasks?: (() => void) | null;
+  onOpenTerminal?: () => void;
   setInput: Dispatch<SetStateAction<string>>;
   isLoadingMoreMessages: boolean;
   hasMoreMessages: boolean;
@@ -76,6 +77,7 @@ export default function ChatMessagesPane({
   tasksEnabled,
   isTaskMasterInstalled,
   onShowAllTasks,
+  onOpenTerminal,
   setInput,
   isLoadingMoreMessages,
   hasMoreMessages,
@@ -160,6 +162,7 @@ export default function ChatMessagesPane({
           tasksEnabled={tasksEnabled}
           isTaskMasterInstalled={isTaskMasterInstalled}
           onShowAllTasks={onShowAllTasks}
+          onOpenTerminal={onOpenTerminal}
           setInput={setInput}
         />
       ) : (

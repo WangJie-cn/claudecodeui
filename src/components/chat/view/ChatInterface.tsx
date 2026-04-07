@@ -41,6 +41,7 @@ function ChatInterface({
   sendByCtrlEnter,
   externalMessageUpdate,
   onShowAllTasks,
+  onOpenTerminal,
 }: ChatInterfaceProps) {
   const { tasksEnabled, isTaskMasterInstalled } = useTasksSettings();
   const { t } = useTranslation('chat');
@@ -317,6 +318,7 @@ function ChatInterface({
           tasksEnabled={tasksEnabled}
           isTaskMasterInstalled={isTaskMasterInstalled}
           onShowAllTasks={onShowAllTasks}
+          onOpenTerminal={onOpenTerminal}
           setInput={setInput}
           isLoadingMoreMessages={isLoadingMoreMessages}
           hasMoreMessages={hasMoreMessages}

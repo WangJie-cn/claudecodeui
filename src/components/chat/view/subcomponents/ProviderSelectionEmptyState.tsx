@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, ChevronDown, Terminal } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SessionProviderLogo from "../../../llm-logo-provider/SessionProviderLogo";
 import {
@@ -28,6 +28,7 @@ type ProviderSelectionEmptyStateProps = {
   tasksEnabled: boolean;
   isTaskMasterInstalled: boolean | null;
   onShowAllTasks?: (() => void) | null;
+  onOpenTerminal?: () => void;
   setInput: React.Dispatch<React.SetStateAction<string>>;
 };
 
@@ -112,6 +113,7 @@ export default function ProviderSelectionEmptyState({
   tasksEnabled,
   isTaskMasterInstalled,
   onShowAllTasks,
+  onOpenTerminal,
   setInput,
 }: ProviderSelectionEmptyStateProps) {
   const { t } = useTranslation("chat");
@@ -166,7 +168,7 @@ export default function ProviderSelectionEmptyState({
           </div>
 
           {/* Provider cards — horizontal row, equal width */}
-          <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
+          <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
             {PROVIDERS.map((p) => {
               const active = provider === p.id;
               return (
@@ -208,6 +210,28 @@ export default function ProviderSelectionEmptyState({
               );
             })}
           </div>
+
+          {/* Terminal quick-access button */}
+          {onOpenTerminal && (
+            <div className="mb-6 flex justify-center">
+              <button
+                onClick={onOpenTerminal}
+                className="flex w-full items-center gap-3 rounded-xl border-[1.5px] border-gray-300 bg-card/60 px-4 py-3 transition-all duration-150 hover:border-gray-400 hover:bg-card active:scale-[0.97] dark:border-gray-600 dark:hover:border-gray-500"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                  <Terminal className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                </div>
+                <div className="text-left">
+                  <p className="text-[13px] font-semibold leading-none text-foreground">
+                    Terminal
+                  </p>
+                  <p className="mt-1 text-[11px] leading-tight text-muted-foreground">
+                    Open tmux session in Shell tab
+                  </p>
+                </div>
+              </button>
+            </div>
+          )}
 
           {/* Model picker — appears after provider is chosen */}
           <div
