@@ -409,16 +409,28 @@ export default function Shell({
         </div>
       )}
 
-      {/* Shortcuts always visible on mobile when connected */}
+      {/* Shortcuts + toggle: hidden when chrome hidden, except the toggle button */}
       {isConnected && (
-        <TerminalShortcutsPanel
-          wsRef={wsRef}
-          terminalRef={terminalRef}
-          isConnected={isConnected}
-          bottomOffset="bottom-0"
-          onToggleChrome={handleTerminalTap}
-          chromeHidden={chromeHidden}
-        />
+        chromeHidden ? (
+          <div className="fixed inset-x-0 bottom-0 z-20 flex justify-center pb-[max(4px,env(safe-area-inset-bottom))] md:hidden">
+            <button
+              type="button"
+              onClick={handleTerminalTap}
+              className="rounded-full bg-gray-800/80 px-4 py-1 text-xs text-gray-400 backdrop-blur-sm active:scale-95"
+            >
+              ▲ toolbar
+            </button>
+          </div>
+        ) : (
+          <TerminalShortcutsPanel
+            wsRef={wsRef}
+            terminalRef={terminalRef}
+            isConnected={isConnected}
+            bottomOffset="bottom-0"
+            onToggleChrome={handleTerminalTap}
+            chromeHidden={chromeHidden}
+          />
+        )
       )}
 
     </div>
